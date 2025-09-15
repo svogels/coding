@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming Fundamentals - Adapted Lesson</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #005A9C;
+        }
+        .activity {
+            background: #eef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .teacher-note {
+            background: #fffbe6;
+            border-left: 5px solid #ffc107;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 100%;
+            height: 60px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .definitions {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .terms, .defs {
+            width: 48%;
+        }
+        .term, .def {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .term.selected, .def.selected {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .term.correct, .def.correct {
+            background-color: #d4edda;
+        }
+        .term.incorrect, .def.incorrect {
+            background-color: #f8d7da;
+        }
+        .quiz button {
+            display: block;
+            margin: 5px 0;
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+        }
+        .activity ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        .activity ul li {
+            margin-bottom: 10px;
+        }
+        .feedback {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .word-bank span {
+            background-color: #ddd;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Programming Basics</h1>
+        
+        <section>
+            <h2>What is Programming?</h2>
+            <p>Programming is telling a computer what to do. We give the computer a list of steps to follow. These steps are called code. We use languages like Scratch, Python, or Java to write code.</p>
+        </section>
+
+        <div class="activity">
+            <h3>Activity 1: What is Programming Used For?</h3>
+            <div class="teacher-note">
+                <strong>Teacher:</strong> Check for understanding. Ask students to give one example of something that uses programming. Use simple, real-world examples like a phone app, a video game, or a microwave.
+            </div>
+            <p>Look at the words below. Talk with a partner about which ones are uses for programming. Write down your ideas.</p>
+            <div class="word-bank">
+                <span>Games</span>
+                <span>Websites</span>
+                <span>Apps</span>
+                <span>Simulations</span>
+                <span>Robots</span>
+            </div>
+            <textarea placeholder="Write one use of programming here..."></textarea>
+        </div>
+
+        <div class="activity">
+            <h3>Activity 2: Match the Words</h3>
+            <div class="teacher-note">
+                <strong>Teacher:</strong> Model how to do this activity. Click one term and one definition to show how it works. Provide support as students complete the task.
+            </div>
+            <p>Match the words with what they mean. Click a word and then click the correct meaning.</p>
+            <div class="definitions">
+                <div class="terms">
+                    <div class="term" data-match="1">Programming</div>
+                    <div class="term" data-match="2">Software</div>
+                    <div class="term" data-match="3">Data</div>
+                    <div class="term" data-match="4">Programmer</div>
+                </div>
+                <div class="defs">
+                    <div class="def" data-match="4">A person who writes code.</div>
+                    <div class="def" data-match="1">Giving instructions to a computer.</div>
+                    <div class="def" data-match="3">Information a computer uses, like numbers or text.</div>
+                    <div class="def" data-match="2">Programs that tell a computer what to do (like an app).</div>
+                </div>
+            </div>
+            <button onclick="resetDefinitions()">Try Again</button>
+        </div>
+
+        <section>
+            <h2>Block Coding</h2>
+            <p>Block coding is a way to code by dragging and dropping blocks. It's like building with LEGOs. Each block is a piece of code. Scratch and Blockly are examples of block coding.</p>
+            <div class="quiz" id="quiz1">
+                <p>Which of these uses block coding?</p>
+                <button onclick="checkQuiz(1, 'A')">A) Scratch</button>
+                <button onclick="checkQuiz(1, 'B')">B) Python</button>
+                <p class="feedback" id="feedback1"></p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Text-Based Programming</h2>
+            <p>Text-based programming uses written words and symbols to code. It is more complex than block coding. Python, Java, and C# are examples of text-based languages.</p>
+             <div class="quiz" id="quiz2">
+                <p>Which of these is a text-based language?</p>
+                <button onclick="checkQuiz(2, 'A')">A) Blockly</button>
+                <button onclick="checkQuiz(2, 'B')">B) Python</button>
+                <p class="feedback" id="feedback2"></p>
+            </div>
+        </section>
+
+        <div class="activity">
+            <h3>Activity 3: What is Pseudocode?</h3>
+            <div class="teacher-note">
+                <strong>Teacher:</strong> Explain this task using a simple example, like the steps to make a sandwich. Write the steps on the board.
+            </div>
+            <p>Pseudocode is a simple way of writing down the steps of a program. It's not real code, but it helps us plan. It's like a to-do list for the computer.</p>
+            <h4>Your Turn:</h4>
+            <p>Write the steps to make a cup of tea using pseudocode. Think about what you would do first, second, and so on.</p>
+            <ul>
+                <li>Step 1: <input type="text" placeholder="e.g., Boil water"></li>
+                <li>Step 2: <input type="text" placeholder="e.g., Put teabag in cup"></li>
+                <li>Step 3: <input type="text"></li>
+                <li>Step 4: <input type="text"></li>
+            </ul>
+        </div>
+
+        <div class="activity">
+            <h3>Activity 4: Find the Error</h3>
+            <div class="teacher-note">
+                <strong>Teacher:</strong> Explain what a syntax error is (a mistake in the code, like a spelling mistake). Show an example.
+            </div>
+            <p>A <strong>syntax error</strong> is a mistake in the code that stops the program from working. Can you find the error in the line of code below?</p>
+            <p><code>prnt("Hello, World!")</code></p>
+            <textarea placeholder="What is the mistake in the code above?"></textarea>
+        </div>
+
+    </div>
+
+    <script>
+        let selectedTerm = null;
+        let selectedDef = null;
+
+        const terms = document.querySelectorAll('.term');
+        const defs = document.querySelectorAll('.def');
+
+        terms.forEach(term => {
+            term.addEventListener('click', () => {
+                if (term.classList.contains('correct')) return;
+                if (selectedTerm) {
+                    selectedTerm.classList.remove('selected');
+                }
+                selectedTerm = term;
+                selectedTerm.classList.add('selected');
+                checkMatch();
+            });
+        });
+
+        defs.forEach(def => {
+            def.addEventListener('click', () => {
+                if (def.classList.contains('correct')) return;
+                if (selectedDef) {
+                    selectedDef.classList.remove('selected');
+                }
+                selectedDef = def;
+                selectedDef.classList.add('selected');
+                checkMatch();
+            });
+        });
+
+        function checkMatch() {
+            if (selectedTerm && selectedDef) {
+                if (selectedTerm.dataset.match === selectedDef.dataset.match) {
+                    selectedTerm.classList.add('correct');
+                    selectedDef.classList.add('correct');
+                    selectedTerm.classList.remove('selected');
+                    selectedDef.classList.remove('selected');
+                    selectedTerm = null;
+                    selectedDef = null;
+                } else {
+                    selectedTerm.classList.add('incorrect');
+                    selectedDef.classList.add('incorrect');
+                    setTimeout(() => {
+                        selectedTerm.classList.remove('incorrect', 'selected');
+                        selectedDef.classList.remove('incorrect', 'selected');
+                        selectedTerm = null;
+                        selectedDef = null;
+                    }, 1000);
+                }
+            }
+        }
+
+        function resetDefinitions() {
+            terms.forEach(term => term.classList.remove('correct', 'incorrect', 'selected'));
+            defs.forEach(def => def.classList.remove('correct', 'incorrect', 'selected'));
+        }
+        
+        const correctAnswers = {
+            1: 'A',
+            2: 'B'
+        };
+
+        function checkQuiz(quizId, selectedAnswer) {
+            const feedback = document.getElementById('feedback' + quizId);
+            const buttons = document.querySelector('#quiz' + quizId).querySelectorAll('button');
+            buttons.forEach(button => button.disabled = true); // Disable buttons after one attempt
+
+            if (selectedAnswer === correctAnswers[quizId]) {
+                feedback.textContent = 'Correct! Well done.';
+                feedback.style.color = 'green';
+            } else {
+                feedback.textContent = 'Not quite. The correct answer is ' + correctAnswers[quizId] + '.';
+                feedback.style.color = 'red';
+            }
+        }
+    </script>
+
+</body>
+</html>
