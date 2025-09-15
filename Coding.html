@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming Fundamentals</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #005A9C;
+        }
+        .activity {
+            background: #eef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .definitions {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .terms, .defs {
+            width: 48%;
+        }
+        .term, .def {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .term.selected, .def.selected {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .term.correct, .def.correct {
+            background-color: #d4edda;
+        }
+        .term.incorrect, .def.incorrect {
+            background-color: #f8d7da;
+        }
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .timeline-table th, .timeline-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .timeline-table th {
+            background-color: #eef;
+        }
+        .timeline-table input {
+            width: 95%;
+            border: none;
+            padding: 5px;
+        }
+        .quiz button {
+            display: block;
+            margin: 5px 0;
+        }
+        .activity ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .activity ul li {
+            margin-bottom: 15px;
+        }
+
+        .feedback {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Programming Fundamentals</h1>
+        
+        <section>
+            <h2>Introduction</h2>
+            <p>Programming is the process of creating a set of instructions that a computer can follow to perform specific tasks. It involves writing code in various programming languages, such as Scratch, Blockly, Python, Java, C# or C++, to develop software applications, websites, games, simulations and more.</p>
+        </section>
+
+        <div class="activity">
+            <h3>What do we know?</h3>
+            <p>In pairs, create a brainstorm which details what you know about programming including languages, uses or elements of programming.</p>
+            <textarea placeholder="Type your brainstorm here..."></textarea>
+        </div>
+
+        <div class="activity">
+            <h3>Definition of Concepts</h3>
+            <p>Match the terms with their definitions. Click a term and then click the correct definition.</p>
+            <div class="definitions">
+                <div class="terms">
+                    <div class="term" data-match="1">Programming</div>
+                    <div class="term" data-match="2">Software</div>
+                    <div class="term" data-match="3">Data</div>
+                    <div class="term" data-match="4">Programmer</div>
+                </div>
+                <div class="defs">
+                    <div class="def" data-match="4">A person who writes and tests code to create software applications and solve computing problems.</div>
+                    <div class="def" data-match="1">The process of designing and writing instructions in a specific language to performs specific tasks.</div>
+                    <div class="def" data-match="3">Information that is collected, stored, and processed by a computer, often in the form of numbers, text, or other digital formats.</div>
+                    <div class="def" data-match="2">A collection of programs and data that instructs a computer on how to perform specific tasks and operations.</div>
+                </div>
+            </div>
+            <button onclick="resetDefinitions()">Reset</button>
+        </div>
+
+        <section>
+            <h2>Visual Programming</h2>
+            <p>In computing, a visual programming language, also known as diagrammatic programming, graphical programming or block coding, is a programming language that lets users create programs by manipulating program elements graphically rather than by specifying them textually. Examples of visual programming languages include Blockly and Scratch.</p>
+            <div class="quiz" id="quiz1">
+                <p>Which of the following is a visual programming language?</p>
+                <button onclick="checkQuiz(1, 'A')">A) Scratch</button>
+                <button onclick="checkQuiz(1, 'B')">B) Python</button>
+                <button onclick="checkQuiz(1, 'C')">C) C++</button>
+                <p class="feedback" id="feedback1"></p>
+            </div>
+        </section>
+
+        <section>
+            <h2>General-Purpose Programming</h2>
+            <p>General-purpose programming languages are designed to be versatile and broadly applicable, enabling programmers to develop software for a wide range of applications. These languages are not specialized for any single domain or task but instead provide the necessary features and capabilities to handle various programming challenges. Examples of general-purpose programming languages include C#, C++, Java, JavaScript, Python, Ruby and Visual Basic.</p>
+             <div class="quiz" id="quiz2">
+                <p>Which of the following is a general-purpose programming language?</p>
+                <button onclick="checkQuiz(2, 'A')">A) Blockly</button>
+                <button onclick="checkQuiz(2, 'B')">B) Python</button>
+                <button onclick="checkQuiz(2, 'C')">C) Scratch</button>
+                <p class="feedback" id="feedback2"></p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Object-Oriented Programming</h2>
+            <p>Object-oriented programming is a programming paradigm based on the concept of objects, which can contain data and code. OOP languages include Java, Python, C++, and C#.</p>
+             <div class="quiz" id="quiz3">
+                <p>OOP is based on the concept of:</p>
+                <button onclick="checkQuiz(3, 'A')">A) Functions</button>
+                <button onclick="checkQuiz(3, 'B')">B) Variables</button>
+                <button onclick="checkQuiz(3, 'C')">C) Objects</button>
+                <p class="feedback" id="feedback3"></p>
+            </div>
+        </section>
+
+        <div class="activity">
+            <h3>Research</h3>
+            <h4>Timeline of Key Programming Events</h4>
+            <p>Create a timeline of at least 8 key events that have impacted or involved programming.</p>
+            <table class="timeline-table">
+                <thead>
+                    <tr>
+                        <th>Date/Year</th>
+                        <th>Key Event</th>
+                        <th>Impact on Programming</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" placeholder="e.g., 1957"></td>
+                        <td><input type="text" placeholder="e.g., FORTRAN developed"></td>
+                        <td><input type="text" placeholder="e.g., First high-level language, made programming more accessible"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <ul>
+                <li>
+                    <h4>Define pseudocode and explain how it is used.</h4>
+                    <textarea placeholder="Your answer here..."></textarea>
+                </li>
+                <li>
+                    <h4>Discuss the difference between visual programming and general-purpose programming languages.</h4>
+                    <textarea placeholder="Your answer here..."></textarea>
+                </li>
+                <li>
+                    <h4>What is a syntax error? What does it indicate?</h4>
+                    <textarea placeholder="Your answer here..."></textarea>
+                </li>
+            </ul>
+        </div>
+
+        <div class="activity">
+            <h3>Textbook Activity</h3>
+            <p>Students to read page 74-75 of the textbook</p>
+            <ul>
+                <li>Complete the Skill Builder task on Pg 74</li>
+                <li>Complete the Knowledge builder on Pg 75</li>
+            </ul>
+        </div>
+
+        <button id="downloadPdf">Download Responses as PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let selectedTerm = null;
+        let selectedDef = null;
+
+        const terms = document.querySelectorAll('.term');
+        const defs = document.querySelectorAll('.def');
+
+        terms.forEach(term => {
+            term.addEventListener('click', () => {
+                if (term.classList.contains('correct')) return;
+                if (selectedTerm) {
+                    selectedTerm.classList.remove('selected');
+                }
+                selectedTerm = term;
+                selectedTerm.classList.add('selected');
+                checkMatch();
+            });
+        });
+
+        defs.forEach(def => {
+            def.addEventListener('click', () => {
+                if (def.classList.contains('correct')) return;
+                if (selectedDef) {
+                    selectedDef.classList.remove('selected');
+                }
+                selectedDef = def;
+                selectedDef.classList.add('selected');
+                checkMatch();
+            });
+        });
+
+        function checkMatch() {
+            if (selectedTerm && selectedDef) {
+                if (selectedTerm.dataset.match === selectedDef.dataset.match) {
+                    selectedTerm.classList.add('correct');
+                    selectedDef.classList.add('correct');
+                    selectedTerm.classList.remove('selected');
+                    selectedDef.classList.remove('selected');
+                    selectedTerm = null;
+                    selectedDef = null;
+                } else {
+                    selectedTerm.classList.add('incorrect');
+                    selectedDef.classList.add('incorrect');
+                    setTimeout(() => {
+                        selectedTerm.classList.remove('incorrect', 'selected');
+                        selectedDef.classList.remove('incorrect', 'selected');
+                        selectedTerm = null;
+                        selectedDef = null;
+                    }, 1000);
+                }
+            }
+        }
+
+        function resetDefinitions() {
+            terms.forEach(term => term.classList.remove('correct', 'incorrect', 'selected'));
+            defs.forEach(def => def.classList.remove('correct', 'incorrect', 'selected'));
+        }
+        
+        const correctAnswers = {
+            1: 'A',
+            2: 'B',
+            3: 'C'
+        };
+
+        function checkQuiz(quizId, selectedAnswer) {
+            const feedback = document.getElementById('feedback' + quizId);
+            if (selectedAnswer === correctAnswers[quizId]) {
+                feedback.textContent = 'Correct!';
+                feedback.style.color = 'green';
+            } else {
+                feedback.textContent = 'Incorrect. Try again.';
+                feedback.style.color = 'red';
+            }
+        }
+
+        document.getElementById('downloadPdf').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 15;
+            const pageHeight = doc.internal.pageSize.height;
+            const margin = 10;
+
+            function addText(text, isTitle = false) {
+                if (y > pageHeight - margin) {
+                    doc.addPage();
+                    y = 15;
+                }
+                doc.setFontSize(isTitle ? 14 : 12);
+                const splitText = doc.splitTextToSize(text, 180);
+                doc.text(splitText, 15, y);
+                y += (splitText.length * 7) + 5;
+            }
+
+            doc.setFontSize(18);
+            doc.text("Programming Fundamentals Responses", 10, y);
+            y += 15;
+
+            // 1. What do we know?
+            addText("What do we know?", true);
+            const brainstorm = document.querySelector('textarea[placeholder="Type your brainstorm here..."]').value;
+            addText(brainstorm || "No response.");
+
+            // 2. Definitions
+            addText("Definition of Concepts", true);
+            const termElements = document.querySelectorAll('.term');
+            termElements.forEach(term => {
+                const termText = term.textContent;
+                const matchId = term.dataset.match;
+                const defElement = document.querySelector(`.def[data-match="${matchId}"]`);
+                const defText = defElement.textContent;
+                addText(`${termText}: ${defText}`);
+            });
+             y += 5;
+
+            // 3. Timeline
+            addText("Timeline of Key Programming Events", true);
+            const tableRows = document.querySelectorAll('.timeline-table tbody tr');
+            tableRows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const date = inputs[0].value;
+                const event = inputs[1].value;
+                const impact = inputs[2].value;
+                if (date || event || impact) {
+                    addText(`Date: ${date || 'N/A'}\nEvent: ${event || 'N/A'}\nImpact: ${impact || 'N/A'}`);
+                }
+            });
+            y += 5;
+
+            // 4. Research Questions
+            addText("Research Questions", true);
+            const researchQuestions = document.querySelectorAll('.activity ul li h4');
+            const researchAnswers = document.querySelectorAll('.activity ul li textarea');
+            researchQuestions.forEach((question, index) => {
+                addText(question.textContent, true);
+                addText(researchAnswers[index].value || "No response.");
+            });
+
+            doc.save('Programming_Fundamentals_Responses.pdf');
+        });
+
+    </script>
+
+</body>
+</html>
