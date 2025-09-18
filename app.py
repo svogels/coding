@@ -184,6 +184,15 @@ def coding_al_html():
 def teacher_html():
     return send_from_directory('.', 'teacher.html')
 
+# API Health Check endpoint
+@app.route('/api', methods=['GET', 'HEAD'])
+def api_health():
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'service': 'Programming Fundamentals Educational Platform'
+    })
+
 # Get current user info for JavaScript
 @app.route('/api/user/current', methods=['GET'])
 @login_required
