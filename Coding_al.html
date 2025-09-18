@@ -206,9 +206,15 @@
             <p><code>prnt("Hello, World!")</code></p>
             <textarea placeholder="What is the mistake in the code above?"></textarea>
         </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <p>Your responses are automatically saved as you work.</p>
+            <button id="downloadPdf" class="btn-primary" onclick="generateProgressReport()" style="background-color: #005A9C; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Download My Progress Report</button>
+        </div>
 
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // Global variables for student tracking
         let currentStudent = null;
@@ -268,12 +274,31 @@
                     const textarea = document.querySelector('textarea[placeholder="Write one use of programming here..."]');
                     if (textarea) textarea.value = studentAnswer;
                 }
+                else if (questionType === 'pseudocode') {
+                    const stepNumber = parseInt(questionId.replace('pseudocode_step_', '')) - 1;
+                    const inputs = document.querySelectorAll('ul li input[type="text"]');
+                    if (inputs[stepNumber]) inputs[stepNumber].value = studentAnswer;
+                }
+                else if (questionType === 'error_finding') {
+                    const textarea = document.querySelector('textarea[placeholder="What is the mistake in the code above?"]');
+                    if (textarea) textarea.value = studentAnswer;
+                }
                 else if (questionType === 'quiz') {
                     const quizId = questionId.replace('quiz_', '');
                     const buttons = document.querySelectorAll(`#quiz${quizId} button`);
                     buttons.forEach(button => {
                         if (button.textContent.includes(studentAnswer)) {
-                            button.click();
+                            // Don't actually click, just mark as answered and show feedback
+                            button.disabled = true;
+                            const feedback = document.getElementById('feedback' + quizId);
+                            const isCorrect = studentAnswer === correctAnswers[quizId];
+                            if (isCorrect) {
+                                feedback.textContent = 'Correct! Well done.';
+                                feedback.style.color = 'green';
+                            } else {
+                                feedback.textContent = 'Not quite. The correct answer is ' + correctAnswers[quizId] + '.';
+                                feedback.style.color = 'red';
+                            }
                         }
                     });
                 }
@@ -413,6 +438,82 @@
             autoSave('quiz', `quiz_${quizId}`, selectedAnswer, isCorrect);
         }
         
+        // Generate PDF progress report
+        function generateProgressReport() {
+            if (!currentStudent) {
+                alert('Please wait for user data to load.');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 15;
+            const pageHeight = doc.internal.pageSize.height;
+            const margin = 10;
+
+            function addText(text, isTitle = false) {
+                if (y > pageHeight - margin) {
+                    doc.addPage();
+                    y = 15;
+                }
+                doc.setFontSize(isTitle ? 14 : 12);
+                const splitText = doc.splitTextToSize(text, 180);
+                doc.text(splitText, 15, y);
+                y += (splitText.length * 7) + 5;
+            }
+
+            doc.setFontSize(18);
+            doc.text("Programming Basics - Progress Report", 10, y);
+            y += 15;
+
+            // Student info
+            addText(`Student: ${currentStudent.student_name}`, true);
+            addText(`Email: ${currentStudent.email}`);
+            addText(`Date: ${new Date().toLocaleDateString()}`);
+            y += 10;
+
+            // Programming uses
+            addText("Programming Uses", true);
+            const programmingUsesAnswer = document.querySelector('textarea[placeholder="Write one use of programming here..."]').value;
+            addText(programmingUsesAnswer || "No response provided.");
+            y += 5;
+
+            // Quiz Responses
+            addText("Quiz Responses", true);
+            addText(`Block Coding Question: ${document.getElementById('feedback1').textContent || 'Not answered'}`);
+            addText(`Text-Based Programming Question: ${document.getElementById('feedback2').textContent || 'Not answered'}`);
+            y += 5;
+
+            // Definition matching
+            addText("Definition Matching", true);
+            const termElements = document.querySelectorAll('.term');
+            termElements.forEach(term => {
+                if (term.classList.contains('correct')) {
+                    const matchId = term.dataset.match;
+                    const defElement = document.querySelector(`.def[data-match="${matchId}"]`);
+                    addText(`${term.textContent}: ${defElement.textContent}`);
+                }
+            });
+            y += 5;
+
+            // Pseudocode activity
+            addText("Pseudocode Steps for Making Tea", true);
+            const pseudocodeInputs = document.querySelectorAll('ul li input[type="text"]');
+            pseudocodeInputs.forEach((input, index) => {
+                if (input.value) {
+                    addText(`Step ${index + 1}: ${input.value}`);
+                }
+            });
+            y += 5;
+
+            // Error finding activity
+            addText("Error Finding", true);
+            const errorAnswer = document.querySelector('textarea[placeholder="What is the mistake in the code above?"]').value;
+            addText(`Error identified: ${errorAnswer || "No response provided."}`);
+
+            doc.save(`${currentStudent.student_name}_Programming_Basics_Progress.pdf`);
+        }
+        
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             // Load current user and initialize lesson
@@ -423,6 +524,22 @@
             if (programmingUsesTextarea) {
                 programmingUsesTextarea.addEventListener('input', () => {
                     autoSave('programming_uses', 'programming_uses_1', programmingUsesTextarea.value);
+                });
+            }
+            
+            // Add auto-save listeners to pseudocode inputs
+            const pseudocodeInputs = document.querySelectorAll('ul li input[type="text"]');
+            pseudocodeInputs.forEach((input, index) => {
+                input.addEventListener('input', () => {
+                    autoSave('pseudocode', `pseudocode_step_${index + 1}`, input.value);
+                });
+            });
+            
+            // Add auto-save listener to error finding textarea
+            const errorTextarea = document.querySelector('textarea[placeholder="What is the mistake in the code above?"]');
+            if (errorTextarea) {
+                errorTextarea.addEventListener('input', () => {
+                    autoSave('error_finding', 'error_finding_1', errorTextarea.value);
                 });
             }
         });
