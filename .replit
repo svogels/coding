@@ -1,10 +1,11 @@
-modules = ["web", "python-3.11"]
+modules = ["web", "python-3.11", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
 
 [agent]
 expertMode = true
+integrations = ["javascript_database:1.0.0"]
 
 [workflows]
 runButton = "Project"
@@ -16,15 +17,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Web Server"
+args = "Student Tracking Server"
 
 [[workflows.workflow]]
-name = "Web Server"
+name = "Student Tracking Server"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python3 -m http.server 5000 --bind 0.0.0.0"
+args = "python app.py"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -33,6 +34,10 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 42059
+externalPort = 3000
 
 [deployment]
 deploymentTarget = "autoscale"

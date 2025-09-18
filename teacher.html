@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Programming Lessons</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #005A9C;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #005A9C;
+        }
+        .btn {
+            background: #005A9C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #004080;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .students-table th,
+        .students-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .students-table th {
+            background-color: #005A9C;
+            color: white;
+        }
+        .students-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .students-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .student-details {
+            display: none;
+            margin-top: 30px;
+            border-top: 2px solid #005A9C;
+            padding-top: 20px;
+        }
+        .response-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #005A9C;
+            border-radius: 4px;
+        }
+        .back-nav {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Teacher Dashboard</h1>
+            <div>
+                <a href="index.html" class="btn btn-secondary">Back to Lessons</a>
+                <button class="btn" onclick="refreshData()">Refresh Data</button>
+            </div>
+        </div>
+
+        <div id="studentsOverview">
+            <h2>Student Progress Overview</h2>
+            <div id="loading" class="loading">Loading student data...</div>
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <table id="studentsTable" class="students-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Class</th>
+                        <th>Lessons Started</th>
+                        <th>Total Responses</th>
+                        <th>Last Activity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="studentDetails" class="student-details">
+            <div class="back-nav">
+                <button class="btn btn-secondary" onclick="showOverview()">← Back to Overview</button>
+            </div>
+            <h2 id="studentDetailsTitle">Student Details</h2>
+            <div id="studentDetailsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let studentsData = [];
+
+        async function loadStudents() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const table = document.getElementById('studentsTable');
+            
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                table.style.display = 'none';
+                
+                // Add authentication header
+                const credentials = btoa('teacher:education123'); // Basic auth
+                const response = await fetch('/api/teacher/students', {
+                    headers: {
+                        'Authorization': 'Basic ' + credentials
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    studentsData = data.students;
+                    displayStudents(studentsData);
+                    loading.style.display = 'none';
+                    table.style.display = 'table';
+                } else {
+                    throw new Error(data.error || 'Failed to load students');
+                }
+            } catch (err) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = 'Error loading student data: ' + err.message;
+            }
+        }
+
+        function displayStudents(students) {
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+            
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #666;">No students have started lessons yet.</td></tr>';
+                return;
+            }
+            
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${student.student_name}</strong></td>
+                    <td>${student.student_id || '-'}</td>
+                    <td>${student.class_name || '-'}</td>
+                    <td>${student.lessons_started || 0}</td>
+                    <td>${student.total_responses || 0}</td>
+                    <td>${new Date(student.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn" onclick="viewStudentDetails(${student.id})" style="padding: 5px 10px; font-size: 12px;">View Details</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function viewStudentDetails(studentId) {
+            const overview = document.getElementById('studentsOverview');
+            const details = document.getElementById('studentDetails');
+            const title = document.getElementById('studentDetailsTitle');
+            const content = document.getElementById('studentDetailsContent');
+            
+            try {
+                // Find student
+                const student = studentsData.find(s => s.id === studentId);
+                if (!student) {
+                    alert('Student not found');
+                    return;
+                }
+                
+                // Show loading
+                content.innerHTML = '<div class="loading">Loading student details...</div>';
+                overview.style.display = 'none';
+                details.style.display = 'block';
+                title.textContent = `${student.student_name} - Detailed Progress`;
+                
+                // Fetch detailed data with authentication
+                const credentials = btoa('teacher:education123'); // Basic auth
+                const response = await fetch(`/api/teacher/student/${studentId}/details`, {
+                    headers: {
+                        'Authorization': 'Basic ' + credentials
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayStudentDetails(data);
+                } else {
+                    content.innerHTML = `<div class="error">Error loading details: ${data.error}</div>`;
+                }
+            } catch (err) {
+                content.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+            }
+        }
+
+        function displayStudentDetails(data) {
+            const content = document.getElementById('studentDetailsContent');
+            const student = data.student;
+            const responses = data.responses;
+            
+            let html = `
+                <div style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3>Student Information</h3>
+                    <p><strong>Name:</strong> ${student.student_name}</p>
+                    <p><strong>Student ID:</strong> ${student.student_id || 'Not provided'}</p>
+                    <p><strong>Class:</strong> ${student.class_name || 'Not provided'}</p>
+                    <p><strong>Started:</strong> ${new Date(student.created_at).toLocaleDateString()}</p>
+                </div>
+            `;
+            
+            if (responses.length === 0) {
+                html += '<p style="color: #666;">No responses recorded yet.</p>';
+            } else {
+                // Group responses by lesson
+                const lessonGroups = {};
+                responses.forEach(resp => {
+                    if (!lessonGroups[resp.lesson_title]) {
+                        lessonGroups[resp.lesson_title] = [];
+                    }
+                    lessonGroups[resp.lesson_title].push(resp);
+                });
+                
+                html += '<h3>Lesson Responses</h3>';
+                
+                Object.keys(lessonGroups).forEach(lessonTitle => {
+                    html += `<h4>${lessonTitle}</h4>`;
+                    
+                    lessonGroups[lessonTitle].forEach(resp => {
+                        const answer = typeof resp.student_answer === 'string' ? resp.student_answer : JSON.stringify(resp.student_answer);
+                        const correctIcon = resp.is_correct === true ? '✅' : resp.is_correct === false ? '❌' : '';
+                        
+                        html += `
+                            <div class="response-item">
+                                <strong>${resp.question_type.charAt(0).toUpperCase() + resp.question_type.slice(1)}:</strong> ${resp.question_id} ${correctIcon}<br>
+                                <em>Response:</em> ${answer.substring(0, 200)}${answer.length > 200 ? '...' : ''}<br>
+                                <small>Submitted: ${new Date(resp.updated_at).toLocaleString()}</small>
+                            </div>
+                        `;
+                    });
+                });
+            }
+            
+            html += `
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn" onclick="exportStudentData(${student.id})">Export Student Data</button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        function showOverview() {
+            document.getElementById('studentsOverview').style.display = 'block';
+            document.getElementById('studentDetails').style.display = 'none';
+        }
+
+        function refreshData() {
+            loadStudents();
+        }
+
+        function exportStudentData(studentId) {
+            // Simple export functionality - could be enhanced
+            const student = studentsData.find(s => s.id === studentId);
+            if (student) {
+                alert(`Export functionality for ${student.student_name} would generate a detailed PDF report here.`);
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudents();
+        });
+    </script>
+</body>
+</html>

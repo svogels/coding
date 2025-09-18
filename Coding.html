@@ -96,11 +96,98 @@
         .feedback {
             font-weight: bold;
         }
+        .login-section {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #005A9C;
+        }
+        .login-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn-primary {
+            background: #005A9C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background: #004080;
+        }
+        .student-info {
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .save-status {
+            color: #28a745;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .lesson-content {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .lesson-content.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Programming Fundamentals</h1>
+        <div class="login-section" id="loginSection">
+            <h2>Student Login</h2>
+            <p>Please enter your information to start the lesson:</p>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="studentName">Your Name *</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentId">Student ID (optional)</label>
+                    <input type="text" id="studentId">
+                </div>
+                <div class="form-group">
+                    <label for="className">Class (optional)</label>
+                    <input type="text" id="className">
+                </div>
+                <button class="btn-primary" onclick="studentLogin()">Start Lesson</button>
+            </div>
+        </div>
+        
+        <div class="student-info hidden" id="studentInfo">
+            <strong>Student:</strong> <span id="currentStudentName"></span> 
+            <span id="currentStudentId"></span>
+            <button class="btn-primary" onclick="logout()" style="float: right; padding: 5px 10px;">Logout</button>
+        </div>
+        
+        <div class="lesson-content" id="lessonContent">
+            <h1>Programming Fundamentals</h1>
         
         <section>
             <h2>Introduction</h2>
@@ -249,11 +336,21 @@
             </ul>
         </div>
 
-        <button id="downloadPdf">Download Responses as PDF</button>
+        <div style="text-align: center; margin-top: 30px;">
+            <p>Your responses are automatically saved as you work.</p>
+            <button class="btn-primary" onclick="generateProgressReport()">Download My Progress Report</button>
+        </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+        // Global variables for student tracking
+        let currentStudent = null;
+        const lessonSlug = 'coding';
+        
+        // Auto-save delay
+        let saveTimeout = null;
         let selectedTerm = null;
         let selectedDef = null;
 
@@ -390,7 +487,13 @@
                 addText(researchAnswers[index].value || "No response.");
             });
 
-            doc.save('Programming_Fundamentals_Responses.pdf');
+            doc.save(`${currentStudent.student_name}_Programming_Fundamentals_Progress.pdf`);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lesson content starts disabled
+            document.getElementById('lessonContent').classList.remove('active');
         });
 
     </script>
