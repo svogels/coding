@@ -101,6 +101,18 @@
 </head>
 <body>
     <div class="container">
+        <div style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #005A9C;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>Student:</strong> <span id="currentStudentName">Loading...</span> 
+                    <span id="currentStudentEmail"></span>
+                    <span style="color: #28a745; font-size: 12px; margin-left: 10px;" id="saveStatus"></span>
+                </div>
+                <div>
+                    <a href="/logout" style="text-decoration: none; padding: 8px 16px; background: #6c757d; color: white; border-radius: 4px; font-size: 14px;">Logout</a>
+                </div>
+            </div>
+        </div>
         <h1>Programming Basics</h1>
         
         <section>
@@ -198,6 +210,121 @@
     </div>
 
     <script>
+        // Global variables for student tracking
+        let currentStudent = null;
+        const lessonSlug = 'coding_al';
+        
+        // Auto-save delay
+        let saveTimeout = null;
+        
+        // Load current user and initialize lesson
+        async function loadCurrentUser() {
+            try {
+                const response = await fetch('/api/user/current');
+                if (response.ok) {
+                    currentStudent = await response.json();
+                    document.getElementById('currentStudentName').textContent = currentStudent.student_name;
+                    document.getElementById('currentStudentEmail').textContent = `(${currentStudent.email})`;
+                    
+                    // Load existing progress
+                    await loadStudentProgress();
+                } else {
+                    // Redirect to login if not authenticated
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+                window.location.href = '/login';
+            }
+        }
+        
+        // Load student's existing progress for this lesson
+        async function loadStudentProgress() {
+            try {
+                const response = await fetch(`/api/student/lesson/${lessonSlug}/progress`);
+                if (response.ok) {
+                    const data = await response.json();
+                    restoreStudentResponses(data.responses);
+                }
+            } catch (error) {
+                console.error('Error loading progress:', error);
+            }
+        }
+        
+        // Restore student responses from database
+        function restoreStudentResponses(responses) {
+            responses.forEach(response => {
+                const questionId = response.question_id;
+                const questionType = response.question_type;
+                let studentAnswer;
+                
+                try {
+                    studentAnswer = JSON.parse(response.student_answer);
+                } catch {
+                    studentAnswer = response.student_answer;
+                }
+                
+                if (questionType === 'programming_uses') {
+                    const textarea = document.querySelector('textarea[placeholder="Write one use of programming here..."]');
+                    if (textarea) textarea.value = studentAnswer;
+                }
+                else if (questionType === 'quiz') {
+                    const quizId = questionId.replace('quiz_', '');
+                    const buttons = document.querySelectorAll(`#quiz${quizId} button`);
+                    buttons.forEach(button => {
+                        if (button.textContent.includes(studentAnswer)) {
+                            button.click();
+                        }
+                    });
+                }
+                else if (questionType === 'definitions') {
+                    // For definitions, mark matches as correct
+                    if (response.is_correct) {
+                        const term = document.querySelector(`[data-match="${questionId}"].term`);
+                        const def = document.querySelector(`[data-match="${questionId}"].def`);
+                        if (term && def) {
+                            term.classList.add('correct');
+                            def.classList.add('correct');
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Auto-save function
+        async function autoSave(questionType, questionId, studentAnswer, isCorrect = null) {
+            if (!currentStudent) return;
+            
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch('/api/response/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            lesson_slug: lessonSlug,
+                            question_type: questionType,
+                            question_id: questionId,
+                            student_answer: studentAnswer,
+                            is_correct: isCorrect
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        document.getElementById('saveStatus').textContent = '✓ Saved';
+                        setTimeout(() => {
+                            document.getElementById('saveStatus').textContent = '';
+                        }, 2000);
+                    }
+                } catch (error) {
+                    console.error('Save error:', error);
+                    document.getElementById('saveStatus').textContent = '⚠ Save failed';
+                }
+            }, 1000);
+        }
+        
         let selectedTerm = null;
         let selectedDef = null;
 
@@ -230,11 +357,19 @@
 
         function checkMatch() {
             if (selectedTerm && selectedDef) {
-                if (selectedTerm.dataset.match === selectedDef.dataset.match) {
+                const isCorrect = selectedTerm.dataset.match === selectedDef.dataset.match;
+                if (isCorrect) {
                     selectedTerm.classList.add('correct');
                     selectedDef.classList.add('correct');
                     selectedTerm.classList.remove('selected');
                     selectedDef.classList.remove('selected');
+                    
+                    // Save correct match
+                    autoSave('definitions', selectedTerm.dataset.match, {
+                        term: selectedTerm.textContent,
+                        definition: selectedDef.textContent
+                    }, true);
+                    
                     selectedTerm = null;
                     selectedDef = null;
                 } else {
@@ -264,15 +399,33 @@
             const feedback = document.getElementById('feedback' + quizId);
             const buttons = document.querySelector('#quiz' + quizId).querySelectorAll('button');
             buttons.forEach(button => button.disabled = true); // Disable buttons after one attempt
-
-            if (selectedAnswer === correctAnswers[quizId]) {
+            
+            const isCorrect = selectedAnswer === correctAnswers[quizId];
+            if (isCorrect) {
                 feedback.textContent = 'Correct! Well done.';
                 feedback.style.color = 'green';
             } else {
                 feedback.textContent = 'Not quite. The correct answer is ' + correctAnswers[quizId] + '.';
                 feedback.style.color = 'red';
             }
+            
+            // Auto-save quiz response
+            autoSave('quiz', `quiz_${quizId}`, selectedAnswer, isCorrect);
         }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load current user and initialize lesson
+            loadCurrentUser();
+            
+            // Add auto-save listener to programming uses textarea
+            const programmingUsesTextarea = document.querySelector('textarea[placeholder="Write one use of programming here..."]');
+            if (programmingUsesTextarea) {
+                programmingUsesTextarea.addEventListener('input', () => {
+                    autoSave('programming_uses', 'programming_uses_1', programmingUsesTextarea.value);
+                });
+            }
+        });
     </script>
 
 </body>

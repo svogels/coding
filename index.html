@@ -66,7 +66,15 @@
 </head>
 <body>
   <div class="container">
-    <h1>Programming Fundamentals Learning Platform</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 15px; background: #e8f4f8; border-radius: 8px;">
+      <div>
+        <h1 style="margin: 0;">Programming Fundamentals Learning Platform</h1>
+        <p style="margin: 5px 0 0 0;">Welcome, <span id="userName">Loading...</span>!</p>
+      </div>
+      <div>
+        <a href="/logout" style="padding: 8px 16px; background: #6c757d; color: white; border-radius: 4px; font-size: 14px;">Logout</a>
+      </div>
+    </div>
     <p>Welcome to our interactive programming education system with automatic progress tracking.</p>
     
     <div class="section student-section">
@@ -95,5 +103,25 @@
       </ul>
     </div>
   </div>
+  
+  <script>
+    // Load current user info
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch('/api/user/current');
+        if (response.ok) {
+          const user = await response.json();
+          document.getElementById('userName').textContent = user.student_name;
+        } else {
+          window.location.href = '/login';
+        }
+      } catch (error) {
+        console.error('Error loading user:', error);
+        window.location.href = '/login';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadCurrentUser);
+  </script>
 </body>
 </html>

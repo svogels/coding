@@ -5,7 +5,7 @@ channel = "stable-25_05"
 
 [agent]
 expertMode = true
-integrations = ["javascript_database:1.0.0"]
+integrations = ["javascript_database:1.0.0", "flask_authentication:1.0.0"]
 
 [workflows]
 runButton = "Project"
@@ -36,8 +36,8 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 39017
-externalPort = 3001
+localPort = 45913
+externalPort = 3000
 
 [deployment]
 deploymentTarget = "autoscale"
